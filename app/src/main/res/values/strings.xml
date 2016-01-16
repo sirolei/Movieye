@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Movieye</string>
+    
+    <string name="action_sort_popular">Popular</string>
+    <string name="action_sort_rate">Rate</string>
+    <string name="action_setting">Setting</string>
+    <string name="title_detail_activity">MovieDetail</string>
+
+    <string name="main_title">%s Movies</string>
 </resources>

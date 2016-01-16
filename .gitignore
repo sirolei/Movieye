@@ -39,3 +39,6 @@ proguard/
 
 # Android Studio captures folder
 captures/
+
+# Private key setting
+private.properties

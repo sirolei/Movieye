@@ -21,6 +21,16 @@ android {
     repositories{
         mavenCentral()
     }
+
+    buildTypes.each {
+        def password = ''
+        if (rootProject.file('private.properties').exists()){
+            Properties properties = new Properties();
+            properties.load(rootProject.file('private.properties').newDataInputStream())
+            password = properties.getProperty('tmdbApiKey');
+        }
+        it.buildConfigField 'String', 'TMDB_API_KEY', password
+    }
 }
 
 dependencies {
