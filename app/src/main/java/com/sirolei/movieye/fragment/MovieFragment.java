@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
@@ -21,6 +22,7 @@ import com.sirolei.movieye.FetchMoviesTask;
 import com.sirolei.movieye.R;
 import com.sirolei.movieye.adapter.MovieAdapter;
 import com.sirolei.movieye.bean.Movie;
+import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ import java.util.Arrays;
  * Created by sansi on 2016/1/16.
  */
 public class MovieFragment extends Fragment implements AdapterView.OnItemClickListener,
-        FetchMoviesTask.OnPostExecuteListener {
+        FetchMoviesTask.OnPostExecuteListener, AbsListView.OnScrollListener{
 
     private final String TAG = MovieFragment.class.getSimpleName();
     private String popUrl = "http://api.themoviedb.org/3/movie/popular?page=1&api_key=87941f3e4714ec06d5bf65f0a968a61f";
@@ -62,6 +64,7 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
         movieAdapter = new MovieAdapter(new ArrayList<Movie>(), getActivity());
         mGridView.setAdapter(movieAdapter);
         mGridView.setOnItemClickListener(this);
+        mGridView.setOnScrollListener(this);
         return rootView;
     }
 
@@ -125,5 +128,26 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onPreExecute() {
         mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        final Picasso picasso = Picasso.with(getActivity());
+        if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL){
+            picasso.resumeTag(MovieAdapter.PICASSO_TAG);
+        }else {
+            picasso.pauseTag(MovieAdapter.PICASSO_TAG);
+        }
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Picasso.with(getActivity()).cancelTag(MovieAdapter.PICASSO_TAG);
     }
 }

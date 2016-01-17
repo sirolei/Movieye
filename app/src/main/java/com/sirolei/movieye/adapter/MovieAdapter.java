@@ -22,7 +22,7 @@ public class MovieAdapter extends BaseAdapter {
     private final String LOG_TAG = MovieAdapter.class.getSimpleName();
     private ArrayList<Movie> movieArrayList;
     private Context mContext;
-
+    public static final String PICASSO_TAG = "Movie Poster";
     public MovieAdapter(ArrayList<Movie> movieArrayList, Context context) {
         this.movieArrayList = movieArrayList;
         mContext = context;
@@ -59,6 +59,7 @@ public class MovieAdapter extends BaseAdapter {
         picasso.load(movieArrayList.get(position).getImgUrl())
                 .placeholder(R.mipmap.ic_movie_holder)
                 .error(R.mipmap.ic_movie_error)
+                .tag(PICASSO_TAG)
                 .into(holder.imageView);
         return convertView;
     }
