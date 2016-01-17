@@ -144,6 +144,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
     private String buildImageUrl(String imgPath){
         String imgUrl = BASE_IMG_URL + "w185" + imgPath;
+        Log.v(LOG_TAG, "imgUrl-- " + imgUrl);
         return imgUrl;
     }
 
@@ -156,11 +157,21 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         }
     }
 
+    @Override
+    protected void onPreExecute() {
+        if (listener != null){
+            listener.onPreExecute();
+        }else {
+            Log.d(LOG_TAG, "not post execute.");
+        }
+    }
+
     public void setOnPostExecuteListner(OnPostExecuteListener listner){
         this.listener = listner;
     }
 
     public interface OnPostExecuteListener{
         public void onPostExecute(Movie[] movies);
+        public void onPreExecute();
     }
 }

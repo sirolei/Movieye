@@ -56,7 +56,10 @@ public class MovieAdapter extends BaseAdapter {
         holder = (ViewHolder) convertView.getTag();
         Picasso picasso = Picasso.with(mContext);
         picasso.setIndicatorsEnabled(true);
-        picasso.load(movieArrayList.get(position).getImgUrl()).into(holder.imageView);
+        picasso.load(movieArrayList.get(position).getImgUrl())
+                .placeholder(R.mipmap.ic_movie_holder)
+                .error(R.mipmap.ic_movie_error)
+                .into(holder.imageView);
         return convertView;
     }
 
