@@ -7,4 +7,5 @@
     <string name="title_detail_activity">MovieDetail</string>
 
     <string name="main_title">%s Movies</string>
+    <string name="average_vote">%.1f/10</string>
 </resources>

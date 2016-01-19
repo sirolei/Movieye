@@ -107,7 +107,9 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Movie movie = (Movie) movieAdapter.getItem(position);
         Intent intent = new Intent(getActivity(), DetailActivity.class);
-        intent.putExtra(Intent.EXTRA_TEXT, String.valueOf(movie.getId()));
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("Movie", movie);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 

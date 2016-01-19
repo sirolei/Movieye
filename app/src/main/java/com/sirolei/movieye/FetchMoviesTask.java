@@ -137,6 +137,10 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             Movie movie = new Movie();
             movie.setId(movieJsonObj.getInt(OWM_ID));
             movie.setImgUrl(buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
+            movie.setReleaseDate(movieJsonObj.getString(OWM_RELEASE_DATE));
+            movie.setSynopsis(movieJsonObj.getString(OWM_OVERVIEW));
+            movie.setTitle(movieJsonObj.getString(OWM_TITLE));
+            movie.setVoteAverage(movieJsonObj.getDouble(OWM_VOTE_AVERAGE));
             movies[i] = movie;
         }
         return movies;
