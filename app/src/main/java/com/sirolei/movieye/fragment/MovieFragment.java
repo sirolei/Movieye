@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
@@ -24,7 +23,6 @@ import com.sirolei.movieye.adapter.MovieAdapter;
 import com.sirolei.movieye.bean.Movie;
 import com.squareup.picasso.Picasso;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -100,7 +98,6 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onStart() {
         super.onStart();
-        refresh(currentType);
     }
 
     @Override

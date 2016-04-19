@@ -7,19 +7,28 @@ import java.io.Serializable;
  */
 public class Movie implements Serializable{
 
-    private String imgUrl;
+    private String posterUrl;
+    private String backdropUrl;
     private int id;
     private String title;
     private String releaseDate;
     private double voteAverage;
     private String synopsis;
 
-    public String getImgUrl() {
-        return imgUrl;
+    public String getPosterUrl() {
+        return posterUrl;
     }
 
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public void setPosterUrl(String posterUrl) {
+        this.posterUrl = posterUrl;
+    }
+
+    public String getBackdropUrl() {
+        return backdropUrl;
+    }
+
+    public void setBackdropUrl(String backdropUrl) {
+        this.backdropUrl = backdropUrl;
     }
 
     public int getId() {

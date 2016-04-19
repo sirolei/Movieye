@@ -52,6 +52,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         try {
+            Log.d(LOG_TAG, buildUrlStr);
             URL url = new URL(buildUrlStr);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -136,7 +137,8 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             JSONObject movieJsonObj = moviesArray.getJSONObject(i);
             Movie movie = new Movie();
             movie.setId(movieJsonObj.getInt(OWM_ID));
-            movie.setImgUrl(buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
+            movie.setPosterUrl(buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
+            movie.setBackdropUrl(buildImageUrl(movieJsonObj.getString(OWM_BACKDROP)));
             movie.setReleaseDate(movieJsonObj.getString(OWM_RELEASE_DATE));
             movie.setSynopsis(movieJsonObj.getString(OWM_OVERVIEW));
             movie.setTitle(movieJsonObj.getString(OWM_TITLE));
@@ -148,7 +150,6 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
     private String buildImageUrl(String imgPath){
         String imgUrl = BASE_IMG_URL + "w185" + imgPath;
-        Log.v(LOG_TAG, "imgUrl-- " + imgUrl);
         return imgUrl;
     }
 

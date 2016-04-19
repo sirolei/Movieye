@@ -1,7 +1,6 @@
 package com.sirolei.movieye.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,6 @@ public class MovieAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        Log.v(LOG_TAG, "get count " + movieArrayList.size());
         return movieArrayList.size();
     }
 
@@ -56,7 +54,7 @@ public class MovieAdapter extends BaseAdapter {
         holder = (ViewHolder) convertView.getTag();
         Picasso picasso = Picasso.with(mContext);
         picasso.setIndicatorsEnabled(true);
-        picasso.load(movieArrayList.get(position).getImgUrl())
+        picasso.load(movieArrayList.get(position).getPosterUrl())
                 .placeholder(R.mipmap.ic_movie_holder)
                 .error(R.mipmap.ic_movie_error)
                 .tag(PICASSO_TAG)

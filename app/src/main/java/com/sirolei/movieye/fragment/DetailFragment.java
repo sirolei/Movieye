@@ -36,7 +36,7 @@ public class DetailFragment extends Fragment {
         synopsis.setText(movie.getSynopsis());
         average_vote.setText(String.format(getString(R.string.average_vote), movie.getVoteAverage()));
         Picasso.with(getActivity())
-                .load(movie.getImgUrl())
+                .load(movie.getPosterUrl())
                 .placeholder(R.mipmap.ic_movie_holder)
                 .error(R.mipmap.ic_movie_error)
                 .into(poster);
