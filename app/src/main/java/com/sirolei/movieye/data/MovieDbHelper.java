@@ -44,6 +44,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.PopMovieEntry.COLUNM_POPULARITY + " REAL NOT NULL, " +
                 MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE + " TEXT NOT NULL, " +
                 MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY + " INTEGER NOT NULL, " +
+                MovieContract.PopMovieEntry.COLUNM_POSTER + " TEXT NOT NULL, " +
                 " FOREIGN KEY(" + MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY + ") REFERENCES " +
                 MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + "), " +
                 " UNIQUE (" + MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY + ") ON CONFLICT REPLACE );";
@@ -53,6 +54,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE + " REAL NOT NULL, " +
                 MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE + " TEXT NOT NULL, " +
                 MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY + " INTEGER NOT NULL, " +
+                MovieContract.RatedMovieEntry.COLUNM_POSTER + " TEXT NOT NULL, " +
                 " FOREIGN KEY(" + MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY + ") REFERENCES " +
                 MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + "), " +
                 " UNIQUE (" + MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY + ") ON CONFLICT REPLACE );";

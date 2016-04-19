@@ -36,6 +36,7 @@ public class MovieContract {
         public static final String COLUNM_MOVIE_KEY = "movie_id";
         public static final String COLUNM_POPULARITY = "popularity";
         public static final String COLUNM_RELEASE_DATE = "release_date";
+        public static final String COLUNM_POSTER = "poster";
     }
 
     public static final class RatedMovieEntry implements BaseColumns{
@@ -43,6 +44,7 @@ public class MovieContract {
         public static final String COLUNM_MOVIE_KEY = "movie_id";
         public static final String COLUNM_AVERATE_VOTE = "vote_average";
         public static final String COLUNM_RELEASE_DATE = "release_date";
+        public static final String COLUNM_POSTER = "poster";
     }
 
 
