@@ -1,10 +1,14 @@
 package com.sirolei.movieye;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.sirolei.movieye.bean.Movie;
+import com.sirolei.movieye.data.MovieContract;
+import com.sirolei.movieye.data.MovieDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -90,14 +94,14 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         }
 
         try {
-            return getMoviesFromJson(moviesStr);
+            return getMoviesFromJson(moviesStr, type);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private Movie[] getMoviesFromJson(String moviesStr) throws JSONException {
+    private Movie[] getMoviesFromJson(String moviesStr, String type) throws JSONException {
         // all results
         final String OWM_PAGE = "page";
         final String OWM_RESULTS = "results";
@@ -133,6 +137,8 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         int amount = moviesArray.length();
         Movie[] movies = new Movie[amount];
+        MovieDbHelper dbHelper = new MovieDbHelper(MovieApplicarion.getAppContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         for (int i = 0; i < amount; i++){
             JSONObject movieJsonObj = moviesArray.getJSONObject(i);
             Movie movie = new Movie();
@@ -143,8 +149,24 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             movie.setSynopsis(movieJsonObj.getString(OWM_OVERVIEW));
             movie.setTitle(movieJsonObj.getString(OWM_TITLE));
             movie.setVoteAverage(movieJsonObj.getDouble(OWM_VOTE_AVERAGE));
+            movie.setPopularity(movieJsonObj.getDouble(OWM_POPULARITY));
+
+            ContentValues contentValues = new ContentValues();
+            if (type == TYPE_POP){
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY, movie.getId());
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POPULARITY, movie.getPopularity());
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE, movie.getReleaseDate());
+                db.insert(MovieContract.PopMovieEntry.TABLE_NAME, null, contentValues);
+            } else if (type == TYPE_RATE){
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY, movie.getId());
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE, movie.getVoteAverage());
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE, movie.getReleaseDate());
+                db.insert(MovieContract.RatedMovieEntry.TABLE_NAME, null, contentValues);
+            }
+
             movies[i] = movie;
         }
+        db.close();
         return movies;
     }
 

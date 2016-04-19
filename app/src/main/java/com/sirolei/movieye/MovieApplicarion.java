@@ -1,6 +1,7 @@
 package com.sirolei.movieye;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.facebook.stetho.Stetho;
 
@@ -9,9 +10,16 @@ import com.facebook.stetho.Stetho;
  */
 public class MovieApplicarion extends Application {
 
+    private static Context context;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Stetho.initializeWithDefaults(this);
+        context = this;
+    }
+
+    public static Context getAppContext(){
+        return context;
     }
 }

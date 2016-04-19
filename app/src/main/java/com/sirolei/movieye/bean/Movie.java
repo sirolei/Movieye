@@ -14,6 +14,15 @@ public class Movie implements Serializable{
     private String releaseDate;
     private double voteAverage;
     private String synopsis;
+    private double popularity;
+
+    public double getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(double popularity) {
+        this.popularity = popularity;
+    }
 
     public String getPosterUrl() {
         return posterUrl;
