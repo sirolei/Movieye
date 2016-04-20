@@ -143,6 +143,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
         for (int i = 0; i < amount; i++){
             JSONObject movieJsonObj = moviesArray.getJSONObject(i);
             MovieItem movieItem = new MovieItem();
+            movieItem.setPage(moviesJson.getInt(OWM_PAGE));
             movieItem.setId(movieJsonObj.getInt(OWM_ID));
             movieItem.setPosterUrl(buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
             movieItem.setReleaseDate(movieJsonObj.getString(OWM_RELEASE_DATE));
@@ -151,12 +152,14 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
 
             ContentValues contentValues = new ContentValues();
             if (type == TYPE_POP){
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_PAGE, movieItem.getId());
                 contentValues.put(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
                 contentValues.put(MovieContract.PopMovieEntry.COLUNM_POPULARITY, movieItem.getPopularity());
                 contentValues.put(MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
                 contentValues.put(MovieContract.PopMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
                 db.insert(MovieContract.PopMovieEntry.TABLE_NAME, null, contentValues);
             } else if (type == TYPE_RATE){
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_PAGE, movieItem.getId());
                 contentValues.put(MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
                 contentValues.put(MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE, movieItem.getVoteAverage());
                 contentValues.put(MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
