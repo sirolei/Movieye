@@ -20,7 +20,7 @@ import com.sirolei.movieye.DetailActivity;
 import com.sirolei.movieye.FetchMoviesTask;
 import com.sirolei.movieye.R;
 import com.sirolei.movieye.adapter.MovieAdapter;
-import com.sirolei.movieye.bean.Movie;
+import com.sirolei.movieye.bean.MovieItem;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -42,6 +42,8 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     private ProgressBar mProgressBar;
     private MovieAdapter movieAdapter;
     private String currentType;
+    private FetchMoviesTask task;
+
     public MovieFragment() {
     }
 
@@ -51,15 +53,15 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.fragment_movie_progressbar);
         mGridView = (GridView) rootView.findViewById(R.id.fragment_movie_gridview);
-//        Movie[] movies = {
-//                new Movie(),
-//                new Movie(),
-//                new Movie(),
-//                new Movie(),
-//                new Movie(),
-//                new Movie()
+//        MovieItem[] movies = {
+//                new MovieItem(),
+//                new MovieItem(),
+//                new MovieItem(),
+//                new MovieItem(),
+//                new MovieItem(),
+//                new MovieItem()
 //        };
-        movieAdapter = new MovieAdapter(new ArrayList<Movie>(), getActivity());
+        movieAdapter = new MovieAdapter(new ArrayList<MovieItem>(), getActivity());
         mGridView.setAdapter(movieAdapter);
         mGridView.setOnItemClickListener(this);
         mGridView.setOnScrollListener(this);
@@ -102,25 +104,30 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Movie movie = (Movie) movieAdapter.getItem(position);
+        MovieItem movieItem = (MovieItem) movieAdapter.getItem(position);
         Intent intent = new Intent(getActivity(), DetailActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("Movie", movie);
+        bundle.putSerializable("MovieItem", movieItem);
         intent.putExtras(bundle);
         startActivity(intent);
     }
 
     public void refresh(String type){
-        FetchMoviesTask task = new FetchMoviesTask();
+        if (task != null){
+            task.unregisterListner();
+            task.cancel(true);
+        }
+
+        task = new FetchMoviesTask();
         task.setOnPostExecuteListner(this);
         task.execute(type);
     }
 
     @Override
-    public void onPostExecute(Movie[] movies) {
+    public void onPostExecute(MovieItem[] movies) {
         Log.d(TAG, "get movies " + movies.length);
         movieAdapter.clear();
-        movieAdapter.addAll(new ArrayList<Movie>(Arrays.asList(movies)));
+        movieAdapter.addAll(new ArrayList<MovieItem>(Arrays.asList(movies)));
         mProgressBar.setVisibility(View.GONE);
     }
 
@@ -148,5 +155,14 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     public void onStop() {
         super.onStop();
         Picasso.with(getActivity()).cancelTag(MovieAdapter.PICASSO_TAG);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (task != null){
+            task.unregisterListner();
+            task.cancel(true);
+        }
     }
 }

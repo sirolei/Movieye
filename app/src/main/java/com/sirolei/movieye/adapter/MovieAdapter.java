@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.sirolei.movieye.R;
-import com.sirolei.movieye.bean.Movie;
+import com.sirolei.movieye.bean.MovieItem;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -19,22 +19,22 @@ import java.util.Collection;
  */
 public class MovieAdapter extends BaseAdapter {
     private final String LOG_TAG = MovieAdapter.class.getSimpleName();
-    private ArrayList<Movie> movieArrayList;
+    private ArrayList<MovieItem> movieItemArrayList;
     private Context mContext;
-    public static final String PICASSO_TAG = "Movie Poster";
-    public MovieAdapter(ArrayList<Movie> movieArrayList, Context context) {
-        this.movieArrayList = movieArrayList;
+    public static final String PICASSO_TAG = "MovieItem Poster";
+    public MovieAdapter(ArrayList<MovieItem> movieItemArrayList, Context context) {
+        this.movieItemArrayList = movieItemArrayList;
         mContext = context;
     }
 
     @Override
     public int getCount() {
-        return movieArrayList.size();
+        return movieItemArrayList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return movieArrayList.get(position);
+        return movieItemArrayList.get(position);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class MovieAdapter extends BaseAdapter {
         holder = (ViewHolder) convertView.getTag();
         Picasso picasso = Picasso.with(mContext);
         picasso.setIndicatorsEnabled(true);
-        picasso.load(movieArrayList.get(position).getPosterUrl())
+        picasso.load(movieItemArrayList.get(position).getPosterUrl())
                 .placeholder(R.mipmap.ic_movie_holder)
                 .error(R.mipmap.ic_movie_error)
                 .tag(PICASSO_TAG)
@@ -67,11 +67,11 @@ public class MovieAdapter extends BaseAdapter {
     }
 
     public void clear(){
-        movieArrayList.clear();
+        movieItemArrayList.clear();
     }
 
-    public void addAll(Collection<? extends Movie> collection){
-        movieArrayList.addAll(collection);
+    public void addAll(Collection<? extends MovieItem> collection){
+        movieItemArrayList.addAll(collection);
         notifyDataSetChanged();
     }
 }

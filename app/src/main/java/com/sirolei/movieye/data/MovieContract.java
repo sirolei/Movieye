@@ -19,8 +19,8 @@ public class MovieContract {
         public static final String COLUNM_POPULARITY = "popularity";
         public static final String COLUNM_OVERVIEW = "overview";
         public static final String COLUNM_PRODUCTION_COMPANIES = "production_companies";
-        public static final String COLUNM_PRODUCTION_COUNTRIES = "producation_countries";
-        public static final String COLUNM_REVENUE = "revunue";
+        public static final String COLUNM_PRODUCTION_COUNTRIES = "production_countries";
+        public static final String COLUNM_REVENUE = "revenue";
         public static final String COLUNM_RUNTIME = "runtime";
         public static final String COLUNM_STATUS = "status";
         public static final String COLUNM_TAGLINE = "tagline";
@@ -28,6 +28,7 @@ public class MovieContract {
         public static final String COLUNM_VOTE_COUNT = "vote_count";
         public static final String COLUNM_POSTER = "poster";
         public static final String COLUNM_BACKDROP = "backdrop";
+        public static final String COLUNM_FAVORITE = "favorite";
 
     }
 

@@ -1,4 +1,5 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Movieye</string>
     
     <string name="action_sort_popular">Popular</string>
@@ -8,4 +9,7 @@
 
     <string name="main_title">%s Movies</string>
     <string name="average_vote">%.1f/10</string>
+
+    <string name="runtime"><xliff:g id="runtime">%1$s</xliff:g>min</string>
+    <string name="mark_as_favorite">MARK AS FAVORITE</string>
 </resources>

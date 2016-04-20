@@ -29,8 +29,7 @@
                 android:id="@+id/fragment_detail_poster"
                 android:layout_width="120dp"
                 android:layout_height="180dp"
-                android:layout_marginLeft="14dp"
-                android:src="@mipmap/ic_launcher" />
+                android:layout_marginLeft="14dp"/>
 
             <TextView
                 android:id="@+id/fragment_detail_release"
@@ -39,20 +38,39 @@
                 android:layout_alignTop="@id/fragment_detail_poster"
                 android:layout_marginLeft="30dp"
                 android:layout_toRightOf="@id/fragment_detail_poster"
-                android:text="2015"
-                android:textColor="#737373"
+                android:textColor="@color/colorPrimaryText"
                 android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/fragment_detail_runtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/fragment_detail_release"
+                android:layout_below="@id/fragment_detail_release"
+                android:textStyle="italic"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/fragment_detail_vote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@id/fragment_detail_release"
-                android:layout_below="@id/fragment_detail_release"
+                android:layout_below="@id/fragment_detail_runtime"
                 android:padding="6dp"
-                android:text="8.1/10"
                 android:textColor="@android:color/black"
                 android:textSize="12sp" />
+            
+            <Button
+                android:id="@+id/fragment_detail_markfavorite"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fragment_detail_vote"
+                android:layout_alignLeft="@id/fragment_detail_release"
+                android:text="@string/mark_as_favorite"
+                android:textColor="@color/colorLightText"
+                android:padding="3dp"
+                android:background="@color/colorLightAccent"/>
 
             <TextView
                 android:id="@+id/fragment_detail_synopsis"
@@ -60,8 +78,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/fragment_detail_poster"
                 android:layout_marginTop="30sp"
-                android:text="shadiashdoiasdasdsadasdsadsadsaddadsad"
-                android:textSize="20sp" />
+                android:textSize="18sp"
+                android:gravity="fill_horizontal"/>
 
         </RelativeLayout>
 

@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.sirolei.movieye.bean.Movie;
+import com.sirolei.movieye.bean.MovieItem;
 import com.sirolei.movieye.data.MovieContract;
 import com.sirolei.movieye.data.MovieDbHelper;
 
@@ -25,7 +25,7 @@ import java.net.URL;
 /**
  * Created by sansi on 2016/1/16.
  */
-public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
+public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
 
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
     private String popUrl = "http://api.themoviedb.org/3/movie/popular?page=1&api_key=87941f3e4714ec06d5bf65f0a968a61f";
@@ -42,7 +42,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
     private String moviesStr;
     private OnPostExecuteListener listener;
     @Override
-    protected Movie[] doInBackground(String... params) {
+    protected MovieItem[] doInBackground(String... params) {
         type = params[0];
         if (params.length > 1) {
             page = params[1];
@@ -101,7 +101,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         return null;
     }
 
-    private Movie[] getMoviesFromJson(String moviesStr, String type) throws JSONException {
+    private MovieItem[] getMoviesFromJson(String moviesStr, String type) throws JSONException {
         // all results
         final String OWM_PAGE = "page";
         final String OWM_RESULTS = "results";
@@ -136,35 +136,34 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         }
 
         int amount = moviesArray.length();
-        Movie[] movies = new Movie[amount];
+        MovieItem[] movies = new MovieItem[amount];
         MovieDbHelper dbHelper = new MovieDbHelper(MovieApplicarion.getAppContext());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         for (int i = 0; i < amount; i++){
             JSONObject movieJsonObj = moviesArray.getJSONObject(i);
-            Movie movie = new Movie();
-            movie.setId(movieJsonObj.getInt(OWM_ID));
-            movie.setPosterUrl(buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
-            movie.setBackdropUrl(buildImageUrl(movieJsonObj.getString(OWM_BACKDROP)));
-            movie.setReleaseDate(movieJsonObj.getString(OWM_RELEASE_DATE));
-            movie.setSynopsis(movieJsonObj.getString(OWM_OVERVIEW));
-            movie.setTitle(movieJsonObj.getString(OWM_TITLE));
-            movie.setVoteAverage(movieJsonObj.getDouble(OWM_VOTE_AVERAGE));
-            movie.setPopularity(movieJsonObj.getDouble(OWM_POPULARITY));
+            MovieItem movieItem = new MovieItem();
+            movieItem.setId(movieJsonObj.getInt(OWM_ID));
+            movieItem.setPosterUrl(buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
+            movieItem.setReleaseDate(movieJsonObj.getString(OWM_RELEASE_DATE));
+            movieItem.setVoteAverage(movieJsonObj.getDouble(OWM_VOTE_AVERAGE));
+            movieItem.setPopularity(movieJsonObj.getDouble(OWM_POPULARITY));
 
             ContentValues contentValues = new ContentValues();
             if (type == TYPE_POP){
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY, movie.getId());
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POPULARITY, movie.getPopularity());
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE, movie.getReleaseDate());
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POPULARITY, movieItem.getPopularity());
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
                 db.insert(MovieContract.PopMovieEntry.TABLE_NAME, null, contentValues);
             } else if (type == TYPE_RATE){
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY, movie.getId());
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE, movie.getVoteAverage());
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE, movie.getReleaseDate());
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE, movieItem.getVoteAverage());
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
+                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
                 db.insert(MovieContract.RatedMovieEntry.TABLE_NAME, null, contentValues);
             }
 
-            movies[i] = movie;
+            movies[i] = movieItem;
         }
         db.close();
         return movies;
@@ -176,7 +175,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
     }
 
     @Override
-    protected void onPostExecute(Movie[] movies) {
+    protected void onPostExecute(MovieItem[] movies) {
         if (listener != null && movies != null){
             listener.onPostExecute(movies);
         }else {
@@ -197,8 +196,12 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         this.listener = listner;
     }
 
+    public void unregisterListner(){
+        listener = null;
+    }
+
     public interface OnPostExecuteListener{
-        public void onPostExecute(Movie[] movies);
+        public void onPostExecute(MovieItem[] movies);
         public void onPreExecute();
     }
 }
