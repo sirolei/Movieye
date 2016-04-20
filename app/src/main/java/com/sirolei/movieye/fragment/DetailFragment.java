@@ -1,9 +1,11 @@
 package com.sirolei.movieye.fragment;
 
-import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +19,9 @@ import com.sirolei.movieye.FetchMovieDetailTask;
 import com.sirolei.movieye.R;
 import com.sirolei.movieye.bean.Movie;
 import com.sirolei.movieye.bean.MovieItem;
+import com.sirolei.movieye.data.MovieContract;
+import com.sirolei.movieye.data.MovieDbHelper;
+import com.sirolei.movieye.util.TimeUtility;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -34,7 +39,9 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
     TextView average_vote;
     Button markAsFavorite;
     TextView runtime;
+    TextView releaseDate;
 
+    final String TAG = DetailFragment.class.getSimpleName();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,6 +51,7 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
         synopsis = (TextView) rootView.findViewById(R.id.fragment_detail_synopsis);
         average_vote = (TextView) rootView.findViewById(R.id.fragment_detail_vote);
         runtime = (TextView)rootView.findViewById(R.id.fragment_detail_runtime);
+        releaseDate = (TextView) rootView.findViewById(R.id.fragment_detail_release);
         markAsFavorite = (Button) rootView.findViewById(R.id.fragment_detail_markfavorite);
         markAsFavorite.setOnClickListener(this);
 //        average_vote.setText(String.format(getString(R.string.average_vote), movieItem.getVoteAverage()));
@@ -55,15 +63,56 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
         return rootView;
     }
 
+
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        MovieItem movieItem = (MovieItem) getActivity().getIntent().getSerializableExtra("MovieItem");
+        int id = movieItem.getId();
+
+        MovieDbHelper dbHelper = new MovieDbHelper(getActivity());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String[] columns = new String[]{MovieContract.MovieEntry.COLUNM_TITLE,
+                MovieContract.MovieEntry.COLUNM_VOTE_AVERAGE,
+                MovieContract.MovieEntry.COLUNM_RELEASE_DATE,
+                MovieContract.MovieEntry.COLUNM_OVERVIEW,
+                MovieContract.MovieEntry.COLUNM_FAVORITE,
+                MovieContract.MovieEntry.COLUNM_RUNTIME,
+                MovieContract.MovieEntry.COLUNM_POSTER,
+                MovieContract.MovieEntry.COLUNM_UPDATE_TIME};
+        String selection = "movie_id=?";
+        String[] selectionArgs = new String[]{String.valueOf(id)};
+        Cursor cursor = db.query(MovieContract.MovieEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        if (!cursor.moveToFirst()){
+            updateMovieDetail(String.valueOf(id));
+        }else {
+            cursor.moveToFirst();
+            int lastUpdateDay = TimeUtility.getJulientDay(cursor.getLong(7));
+            int curDay = TimeUtility.getJulientDay(System.currentTimeMillis());
+            if (curDay - lastUpdateDay >= 1){
+                Log.d(TAG, "need updateMovieDetail from " + lastUpdateDay + " to " + curDay);
+                updateMovieDetail(String.valueOf(id));
+            }else {
+                average_vote.setText(String.format(getString(R.string.average_vote), cursor.getDouble(1)));
+                title.setText(cursor.getString(0));
+                synopsis.setText(cursor.getString(3));
+                runtime.setText(getResources().getString(R.string.runtime, cursor.getString(5)));
+                releaseDate.setText(cursor.getString(2));
+                Picasso.with(getActivity())
+                        .load(cursor.getString(6))
+                        .placeholder(R.mipmap.ic_movie_holder)
+                        .error(R.mipmap.ic_movie_error)
+                        .into(poster);
+            }
+        }
+        db.close();
+    }
+
+    private void updateMovieDetail(String id){
         if (task != null){
             task.unregisterListener();
             task.cancel(true);
         }
-        MovieItem movieItem = (MovieItem) getActivity().getIntent().getSerializableExtra("MovieItem");
-        int id = movieItem.getId();
         task = new FetchMovieDetailTask();
         task.setListener(this);
         task.execute(String.valueOf(id));
@@ -86,6 +135,7 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
         title.setText(movie.getTitle());
         synopsis.setText(movie.getOverview());
         runtime.setText(getResources().getString(R.string.runtime, movie.getRuntime()));
+        releaseDate.setText(movie.getReleaseDate());
         Picasso.with(getActivity())
                 .load(movie.getPoster())
                 .placeholder(R.mipmap.ic_movie_holder)

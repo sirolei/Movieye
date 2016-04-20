@@ -139,6 +139,7 @@ public class FetchMovieDetailTask extends AsyncTask<String, Void, Movie> {
             contentValues.put(MovieContract.MovieEntry.COLUNM_TITLE, movie.getTitle());
             contentValues.put(MovieContract.MovieEntry.COLUNM_VOTE_AVERAGE, movie.getVoteAverage());
             contentValues.put(MovieContract.MovieEntry.COLUNM_VOTE_COUNT, movie.getVoteCount());
+            contentValues.put(MovieContract.MovieEntry.COLUNM_UPDATE_TIME, System.currentTimeMillis());
 
             MovieDbHelper dbHelper = new MovieDbHelper(MovieApplicarion.getAppContext());
             SQLiteDatabase db = dbHelper.getWritableDatabase();

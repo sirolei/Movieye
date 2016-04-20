@@ -80,6 +80,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         } finally {
             if (connection != null) {
                 connection.disconnect();

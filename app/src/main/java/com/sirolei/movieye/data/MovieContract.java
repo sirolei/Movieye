@@ -29,6 +29,7 @@ public class MovieContract {
         public static final String COLUNM_POSTER = "poster";
         public static final String COLUNM_BACKDROP = "backdrop";
         public static final String COLUNM_FAVORITE = "favorite";
+        public static final String COLUNM_UPDATE_TIME = "update_time";
 
     }
 
