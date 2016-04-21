@@ -259,7 +259,70 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        return null;
+        int match = sUriMatcher.match(uri);
+        Uri retUri = null;
+        switch (match){
+            case MOVIE: {
+                long id = dbHelper.getWritableDatabase().insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
+                if (id > 0) {
+                    long movie_id = (long) values.get(MovieContract.MovieEntry.COLUNM_MOVIE_ID);
+                    retUri = MovieContract.MovieEntry.buildMovieUrl(movie_id);
+                }else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+            case MOVIE_POP: {
+                long id = dbHelper.getWritableDatabase().insert(MovieContract.PopMovieEntry.TABLE_NAME, null, values);
+                if (id > 0){
+                    int page = (int) values.get(MovieContract.PopMovieEntry.COLUNM_PAGE);
+                    retUri = MovieContract.PopMovieEntry.buildMoviePopUri(page);
+                }else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+            case MOVIE_RATE: {
+                long id = dbHelper.getWritableDatabase().insert(MovieContract.RatedMovieEntry.TABLE_NAME, null, values);
+                if (id > 0){
+                    int page = (int) values.get(MovieContract.RatedMovieEntry.COLUNM_PAGE);
+                    retUri = MovieContract.RatedMovieEntry.buildMovieRateUri(page);
+                }else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+            case MOVIE_VIDEO: {
+                long id = dbHelper.getWritableDatabase().insert(MovieContract.VideoEntry.TABLE_NAME, null, values);
+                if (id > 0){
+                    long movie_id = (long) values.get(MovieContract.VideoEntry.COLUNM_MOVIE_KEY);
+                    retUri = MovieContract.VideoEntry.buildMovieVideoUrl(movie_id);
+                }else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+            case MOVIE_REVIEW: {
+                long id = dbHelper.getWritableDatabase().insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
+                if (id > 0){
+                    long movie_id = (long) values.get(MovieContract.ReviewEntry.COLUNM_MOVIE_KEY);
+                    retUri = MovieContract.ReviewEntry.buildMovieReviewUrl(movie_id);
+                }else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return retUri;
+    }
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        int match = sUriMatcher.match(uri);
+        return super.bulkInsert(uri, values);
     }
 
     @Override
