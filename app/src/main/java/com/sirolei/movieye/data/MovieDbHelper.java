@@ -17,7 +17,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
             MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             MovieContract.MovieEntry.COLUNM_MOVIE_ID + " INTEGER NOT NULL, " +
-            MovieContract.MovieEntry.COLUNM_IMDB_ID + " INTEGER NOT NULL, " +
+            MovieContract.MovieEntry.COLUNM_IMDB_ID + " TEXT NOT NULL, " +
             MovieContract.MovieEntry.COLUNM_ORIGINAL_TITLE + " TEXT NOT NULL, " +
             MovieContract.MovieEntry.COLUNM_TITLE + " TEXT NOT NULL, "+
             MovieContract.MovieEntry.COLUNM_OVERVIEW + " TEXT, " +
@@ -62,7 +62,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE " + MovieContract.VideoEntry.TABLE_NAME + " (" +
             MovieContract.VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             MovieContract.VideoEntry.COLUNM_VIDEO_ID + " TEXT NOT NULL, " +
-            MovieContract.VideoEntry.COLUNM_MOVIE_KEY + " REAL NOT NULL, " +
+            MovieContract.VideoEntry.COLUNM_MOVIE_KEY + " INTEGER NOT NULL, " +
             MovieContract.VideoEntry.COLUNM_KEY + " TEXT NOT NULL, " +
             MovieContract.VideoEntry.COLUNM_NAME + " TEXT NOT NULL, " +
             MovieContract.VideoEntry.COLUNM_SITE + " TEXT NOT NULL, " +
@@ -74,7 +74,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE " + MovieContract.ReviewEntry.TABLE_NAME + " (" +
             MovieContract.ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            MovieContract.ReviewEntry.COLUNM_MOVIE_KEY + " REAL NOT NULL, " +
+            MovieContract.ReviewEntry.COLUNM_MOVIE_KEY + " INTEGER NOT NULL, " +
             MovieContract.ReviewEntry.COLUNM_PAGE + " INTEGER NOT NULL, " +
             MovieContract.ReviewEntry.COLUNM_TOTAL_PAGE + " INTEGER NOT NULL, " +
             MovieContract.ReviewEntry.COLUNM_AUTHOR + " TEXT NOT NULL, " +

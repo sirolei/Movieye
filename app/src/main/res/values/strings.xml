@@ -12,4 +12,7 @@
 
     <string name="runtime"><xliff:g id="runtime">%1$s</xliff:g>min</string>
     <string name="mark_as_favorite">MARK AS FAVORITE</string>
+
+
+    <string name="content_authority">com.sirolei.movieye.provider</string>
 </resources>
