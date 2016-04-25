@@ -14,5 +14,8 @@
     <string name="mark_as_favorite">MARK AS FAVORITE</string>
 
 
-    <string name="content_authority">com.sirolei.movieye.provider</string>
+    <string name="content_authority" translatable="false">com.sirolei.movieye.provider</string>
+
+    <string name="last_pop_update_time" translatable="false">popUpdateTime</string>
+    <string name="last_rate_update_time" translatable="false">rateUpdateTime</string>
 </resources>

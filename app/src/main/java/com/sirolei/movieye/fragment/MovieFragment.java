@@ -1,6 +1,7 @@
 package com.sirolei.movieye.fragment;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,11 +21,9 @@ import com.sirolei.movieye.DetailActivity;
 import com.sirolei.movieye.FetchMoviesTask;
 import com.sirolei.movieye.R;
 import com.sirolei.movieye.adapter.MovieAdapter;
-import com.sirolei.movieye.bean.MovieItem;
+import com.sirolei.movieye.data.MovieContract;
+import com.sirolei.movieye.util.PreferenceUtility;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by sansi on 2016/1/16.
@@ -41,9 +40,9 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     private GridView mGridView;
     private ProgressBar mProgressBar;
     private MovieAdapter movieAdapter;
-    private String currentType;
+    private String currentType = FetchMoviesTask.TYPE_POP;
     private FetchMoviesTask task;
-
+    public static final String INTENT_MOVIE_ID = "movie_id";
     public MovieFragment() {
     }
 
@@ -53,15 +52,8 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.fragment_movie_progressbar);
         mGridView = (GridView) rootView.findViewById(R.id.fragment_movie_gridview);
-//        MovieItem[] movies = {
-//                new MovieItem(),
-//                new MovieItem(),
-//                new MovieItem(),
-//                new MovieItem(),
-//                new MovieItem(),
-//                new MovieItem()
-//        };
-        movieAdapter = new MovieAdapter(new ArrayList<MovieItem>(), getActivity());
+
+        movieAdapter = new MovieAdapter(getActivity(), null);
         mGridView.setAdapter(movieAdapter);
         mGridView.setOnItemClickListener(this);
         mGridView.setOnScrollListener(this);
@@ -84,14 +76,37 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id){
-            case R.id.action_sort_pop:
-                refresh(FetchMoviesTask.TYPE_POP);
+            case R.id.action_sort_pop:{
+                Cursor cursor = getActivity().getContentResolver().query(MovieContract.PopMovieEntry.buildMoviePopUri(1),
+                        null,
+                        null,
+                        null,
+                        null);
+                if ((System.currentTimeMillis() - PreferenceUtility.getPopUpdatetime(getActivity())) > MovieAdapter.DAY_IN_MILLIS
+                        || cursor.moveToFirst() == false){
+                    refresh(FetchMoviesTask.TYPE_POP);
+                }else {
+                    movieAdapter.swapCursor(cursor);
+                }
+
                 currentType = FetchMoviesTask.TYPE_POP;
                 return true;
-            case R.id.action_sort_rate:
-                refresh(FetchMoviesTask.TYPE_RATE);
+            }
+            case R.id.action_sort_rate:{
+                Cursor cursor = getActivity().getContentResolver().query(MovieContract.RateMovieEntry.buildMovieRateUri(1),
+                        null,
+                        null,
+                        null,
+                        null);
+                if ((System.currentTimeMillis() - PreferenceUtility.getRateUpdatetime(getActivity())) > MovieAdapter.DAY_IN_MILLIS
+                        || cursor.moveToFirst() == false){
+                    refresh(FetchMoviesTask.TYPE_RATE);
+                }else {
+                    movieAdapter.swapCursor(cursor);
+                }
                 currentType = FetchMoviesTask.TYPE_RATE;
                 return true;
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -100,19 +115,41 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onStart() {
         super.onStart();
+        if (currentType == FetchMoviesTask.TYPE_POP){
+            Cursor cursor = getActivity().getContentResolver().query(MovieContract.PopMovieEntry.buildMoviePopUri(1),
+                    null,
+                    null,
+                    null,
+                    null);
+            movieAdapter.swapCursor(cursor);
+        }else if (currentType == FetchMoviesTask.TYPE_RATE){
+            Cursor cursor = getActivity().getContentResolver().query(MovieContract.RateMovieEntry.buildMovieRateUri(1),
+                    null,
+                    null,
+                    null,
+                    null);
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        MovieItem movieItem = (MovieItem) movieAdapter.getItem(position);
+        Cursor cursor = movieAdapter.getCursor();
+        cursor.moveToPosition(position);
+        int columnMovieId = -1;
+        if (currentType == FetchMoviesTask.TYPE_POP){
+            columnMovieId = cursor.getColumnIndex(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY);
+        }else {
+            columnMovieId = cursor.getColumnIndex(MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY);
+        }
+        long movieId = cursor.getLong(columnMovieId);
         Intent intent = new Intent(getActivity(), DetailActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("MovieItem", movieItem);
-        intent.putExtras(bundle);
+        intent.putExtra(INTENT_MOVIE_ID, movieId);
         startActivity(intent);
     }
 
     public void refresh(String type){
+
+
         if (task != null){
             task.unregisterListner();
             task.cancel(true);
@@ -124,11 +161,17 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     @Override
-    public void onPostExecute(MovieItem[] movies) {
-        Log.d(TAG, "get movies " + movies.length);
-        movieAdapter.clear();
-        movieAdapter.addAll(new ArrayList<MovieItem>(Arrays.asList(movies)));
+    public void onPostExecute(Cursor cursor) {
         mProgressBar.setVisibility(View.GONE);
+        if (cursor != null){
+            Log.d(TAG, "get movies " + cursor.getCount());
+            movieAdapter.swapCursor(cursor);
+            if (currentType == FetchMoviesTask.TYPE_POP){
+                PreferenceUtility.setPopUpdateTime(getActivity(), System.currentTimeMillis());
+            }else if (currentType == FetchMoviesTask.TYPE_RATE){
+                PreferenceUtility.setRateUpdateTime(getActivity(), System.currentTimeMillis());
+            }
+        }
     }
 
     @Override

@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.sirolei.movieye.FetchMovieDetailTask;
 import com.sirolei.movieye.R;
 import com.sirolei.movieye.bean.Movie;
-import com.sirolei.movieye.bean.MovieItem;
 import com.sirolei.movieye.data.MovieContract;
 import com.sirolei.movieye.data.MovieDbHelper;
 import com.sirolei.movieye.util.TimeUtility;
@@ -67,8 +66,11 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        MovieItem movieItem = (MovieItem) getActivity().getIntent().getSerializableExtra("MovieItem");
-        int id = movieItem.getId();
+
+        long id = getActivity().getIntent().getLongExtra(MovieFragment.INTENT_MOVIE_ID, -1);
+        if (id == -1){
+            return;
+        }
 
         MovieDbHelper dbHelper = new MovieDbHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();

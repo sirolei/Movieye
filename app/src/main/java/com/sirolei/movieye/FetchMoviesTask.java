@@ -1,14 +1,12 @@
 package com.sirolei.movieye;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.sirolei.movieye.bean.MovieItem;
 import com.sirolei.movieye.data.MovieContract;
-import com.sirolei.movieye.data.MovieDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,11 +19,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Vector;
 
 /**
  * Created by sansi on 2016/1/16.
  */
-public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
+public class FetchMoviesTask extends AsyncTask<String, Void, Cursor> {
 
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
     private String popUrl = "http://api.themoviedb.org/3/movie/popular?page=1&api_key=87941f3e4714ec06d5bf65f0a968a61f";
@@ -42,7 +41,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
     private String moviesStr;
     private OnPostExecuteListener listener;
     @Override
-    protected MovieItem[] doInBackground(String... params) {
+    protected Cursor doInBackground(String... params) {
         type = params[0];
         if (params.length > 1) {
             page = params[1];
@@ -102,7 +101,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
         return null;
     }
 
-    private MovieItem[] getMoviesFromJson(String moviesStr, String type) throws JSONException {
+    private Cursor getMoviesFromJson(String moviesStr, String type) throws JSONException {
         // all results
         final String OWM_PAGE = "page";
         final String OWM_RESULTS = "results";
@@ -137,40 +136,48 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
         }
 
         int amount = moviesArray.length();
-        MovieItem[] movies = new MovieItem[amount];
-        MovieDbHelper dbHelper = new MovieDbHelper(MovieApplicarion.getAppContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Vector<ContentValues> cVVector = new Vector<ContentValues>(amount);
+
         for (int i = 0; i < amount; i++){
             JSONObject movieJsonObj = moviesArray.getJSONObject(i);
-            MovieItem movieItem = new MovieItem();
-            movieItem.setPage(moviesJson.getInt(OWM_PAGE));
-            movieItem.setId(movieJsonObj.getInt(OWM_ID));
-            movieItem.setPosterUrl(buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
-            movieItem.setReleaseDate(movieJsonObj.getString(OWM_RELEASE_DATE));
-            movieItem.setVoteAverage(movieJsonObj.getDouble(OWM_VOTE_AVERAGE));
-            movieItem.setPopularity(movieJsonObj.getDouble(OWM_POPULARITY));
-
             ContentValues contentValues = new ContentValues();
             if (type == TYPE_POP){
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_PAGE, movieItem.getId());
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POPULARITY, movieItem.getPopularity());
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
-                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
-                db.insert(MovieContract.PopMovieEntry.TABLE_NAME, null, contentValues);
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_PAGE, moviesJson.getInt(OWM_PAGE));
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY, movieJsonObj.getInt(OWM_ID));
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POPULARITY, movieJsonObj.getDouble(OWM_POPULARITY));
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE, movieJsonObj.getString(OWM_RELEASE_DATE));
+                contentValues.put(MovieContract.PopMovieEntry.COLUNM_POSTER, buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
             } else if (type == TYPE_RATE){
-                contentValues.put(MovieContract.RateMovieEntry.COLUNM_PAGE, movieItem.getId());
-                contentValues.put(MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
-                contentValues.put(MovieContract.RateMovieEntry.COLUNM_AVERATE_VOTE, movieItem.getVoteAverage());
-                contentValues.put(MovieContract.RateMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
-                contentValues.put(MovieContract.RateMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
-                db.insert(MovieContract.RateMovieEntry.TABLE_NAME, null, contentValues);
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_PAGE, moviesJson.getInt(OWM_PAGE));
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY, movieJsonObj.getInt(OWM_ID));
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_AVERATE_VOTE, movieJsonObj.getDouble(OWM_VOTE_AVERAGE));
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_RELEASE_DATE, movieJsonObj.getString(OWM_RELEASE_DATE));
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_POSTER, buildImageUrl(movieJsonObj.getString(OWM_POSTER_PATH)));
             }
 
-            movies[i] = movieItem;
+            cVVector.add(contentValues);
         }
-        db.close();
-        return movies;
+        if (cVVector.size() > 0){
+            ContentValues[] cvArray = new ContentValues[cVVector.size()];
+            cVVector.toArray(cvArray);
+            Uri uri = null;
+            if (type == TYPE_POP){
+                uri = MovieContract.PopMovieEntry.CONTENT_URI;
+            }else if (type == TYPE_RATE){
+                uri = MovieContract.RateMovieEntry.CONTENT_URI;
+            }
+            MovieApplicarion.getAppContext().getContentResolver().bulkInsert(uri, cvArray);
+        }
+
+        Uri retUri = type == TYPE_POP ? MovieContract.PopMovieEntry.buildMoviePopUri(1) : MovieContract.RateMovieEntry.buildMovieRateUri(1);
+
+        Cursor cursor = MovieApplicarion.getAppContext().getContentResolver().query(retUri,
+                null,
+                null,
+                null,
+                null);
+
+        return cursor;
     }
 
     private String buildImageUrl(String imgPath){
@@ -179,9 +186,9 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
     }
 
     @Override
-    protected void onPostExecute(MovieItem[] movies) {
-        if (listener != null && movies != null){
-            listener.onPostExecute(movies);
+    protected void onPostExecute(Cursor cursor) {
+        if (listener != null ){
+            listener.onPostExecute(cursor);
         }else {
             Log.d(LOG_TAG, "not post execute.");
         }
@@ -205,7 +212,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
     }
 
     public interface OnPostExecuteListener{
-        public void onPostExecute(MovieItem[] movies);
+        public void onPostExecute(Cursor cursor);
         public void onPreExecute();
     }
 }
