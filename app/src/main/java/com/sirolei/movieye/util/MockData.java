@@ -38,7 +38,7 @@ public class MockData {
         contentValues.put(MovieContract.PopMovieEntry.COLUNM_POSTER, "testPoster");
         contentValues.put(MovieContract.PopMovieEntry.COLUNM_POPULARITY, 86.88);
         contentValues.put(MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY, movieId);
-        contentValues.put(MovieContract.PopMovieEntry.COLUNM_PAGE, 1);
+        contentValues.put(MovieContract.PopMovieEntry.COLUNM_PAGE, 2);
         contentValues.put(MovieContract.PopMovieEntry.COLUNM_RELEASE_DATE, "2015-05-14");
         return contentValues;
     }
@@ -46,25 +46,25 @@ public class MockData {
     public static ContentValues[] getPopMovieContentValueArray(){
         ContentValues[] contentValueArray = new ContentValues[20];
         for (int i = 0; i < contentValueArray.length; i++){
-            contentValueArray[i] =  getPopMovieContentValue((int)(Math.random() * 1000));
+            contentValueArray[i] =  getPopMovieContentValue(100 + i);
         }
         return contentValueArray;
     }
 
     public static ContentValues getRateMovieContentValue(int movieId){
         ContentValues contentValues = new ContentValues();
-        contentValues.put(MovieContract.RatedMovieEntry.COLUNM_POSTER, "testPoster");
-        contentValues.put(MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE, 86.88);
-        contentValues.put(MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY, movieId);
-        contentValues.put(MovieContract.RatedMovieEntry.COLUNM_PAGE, 1);
-        contentValues.put(MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE, "2015-05-14");
+        contentValues.put(MovieContract.RateMovieEntry.COLUNM_POSTER, "testPoster");
+        contentValues.put(MovieContract.RateMovieEntry.COLUNM_AVERATE_VOTE, 86.88);
+        contentValues.put(MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY, movieId);
+        contentValues.put(MovieContract.RateMovieEntry.COLUNM_PAGE, 1);
+        contentValues.put(MovieContract.RateMovieEntry.COLUNM_RELEASE_DATE, "2015-05-14");
         return contentValues;
     }
 
     public static ContentValues[] getRateMovieContentValueArray(){
-        ContentValues[] contentValueArray = new ContentValues[3];
+        ContentValues[] contentValueArray = new ContentValues[20];
         for (int i = 0; i < contentValueArray.length; i++){
-            contentValueArray[i] =  getRateMovieContentValue((int)(Math.random() * 1000));
+            contentValueArray[i] =  getRateMovieContentValue(100 + i);
         }
         return contentValueArray;
     }
@@ -78,14 +78,14 @@ public class MockData {
         contentValues.put(MovieContract.VideoEntry.COLUNM_SIZE, 720);
         contentValues.put(MovieContract.VideoEntry.COLUNM_SITE, "youtube");
         contentValues.put(MovieContract.VideoEntry.COLUNM_TYPE, "trailer");
-        contentValues.put(MovieContract.VideoEntry.COLUNM_VIDEO_ID, "shdaioahoidsa");
+        contentValues.put(MovieContract.VideoEntry.COLUNM_VIDEO_ID, "shdaioahoidsa" + + Math.random() * 100);
         return contentValues;
     }
 
     public static ContentValues[] getVideoContentValueArray(){
         ContentValues[] contentValueArray = new ContentValues[3];
         for (int i = 0; i < contentValueArray.length; i++){
-            contentValueArray[i] =  getVideoContentValue((int)(Math.random() * 1000));
+            contentValueArray[i] =  getVideoContentValue(103);
         }
         return contentValueArray;
     }
@@ -95,7 +95,7 @@ public class MockData {
         contentValues.put(MovieContract.ReviewEntry.COLUNM_MOVIE_KEY, movieId);
         contentValues.put(MovieContract.ReviewEntry.COLUNM_AUTHOR, "siro");
         contentValues.put(MovieContract.ReviewEntry.COLUNM_PAGE, 1);
-        contentValues.put(MovieContract.ReviewEntry.COLUNM_REVIEW_ID, "dsahidahoi");
+        contentValues.put(MovieContract.ReviewEntry.COLUNM_REVIEW_ID, "dsahidahoi" + Math.random() * 100);
         contentValues.put(MovieContract.ReviewEntry.COLUNM_TOTAL_PAGE, 2);
         contentValues.put(MovieContract.ReviewEntry.COLUNM_URL, "www.movieye.com/review/dsahidahoi");
         return contentValues;
@@ -104,7 +104,7 @@ public class MockData {
     public static ContentValues[] getReviewContentValueArray(){
         ContentValues[] contentValueArray = new ContentValues[3];
         for (int i = 0; i < contentValueArray.length; i++){
-            contentValueArray[i] =  getReviewContentValue((int)(Math.random() * 1000));
+            contentValueArray[i] =  getReviewContentValue(103);
         }
         return contentValueArray;
     }

@@ -48,16 +48,16 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + "), " +
             " UNIQUE (" + MovieContract.PopMovieEntry.COLUNM_MOVIE_KEY + ") ON CONFLICT REPLACE );";
 
-    final String SQL_CREATE_RATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.RatedMovieEntry.TABLE_NAME + " (" +
-            MovieContract.RatedMovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE + " REAL NOT NULL, " +
-            MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE + " TEXT NOT NULL, " +
-            MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY + " INTEGER NOT NULL, " +
-            MovieContract.RatedMovieEntry.COLUNM_POSTER + " TEXT NOT NULL, " +
-            MovieContract.RatedMovieEntry.COLUNM_PAGE + " REAL NOT NULL, " +
-            " FOREIGN KEY(" + MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY + ") REFERENCES " +
+    final String SQL_CREATE_RATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.RateMovieEntry.TABLE_NAME + " (" +
+            MovieContract.RateMovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            MovieContract.RateMovieEntry.COLUNM_AVERATE_VOTE + " REAL NOT NULL, " +
+            MovieContract.RateMovieEntry.COLUNM_RELEASE_DATE + " TEXT NOT NULL, " +
+            MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY + " INTEGER NOT NULL, " +
+            MovieContract.RateMovieEntry.COLUNM_POSTER + " TEXT NOT NULL, " +
+            MovieContract.RateMovieEntry.COLUNM_PAGE + " REAL NOT NULL, " +
+            " FOREIGN KEY(" + MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY + ") REFERENCES " +
             MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + "), " +
-            " UNIQUE (" + MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY + ") ON CONFLICT REPLACE );";
+            " UNIQUE (" + MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY + ") ON CONFLICT REPLACE );";
 
     final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE " + MovieContract.VideoEntry.TABLE_NAME + " (" +
             MovieContract.VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -102,7 +102,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "onUpgrade ");
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.PopMovieEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + MovieContract.RatedMovieEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + MovieContract.RateMovieEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.VideoEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.ReviewEntry.TABLE_NAME);

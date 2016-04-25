@@ -159,12 +159,12 @@ public class FetchMoviesTask extends AsyncTask<String, Void, MovieItem[]> {
                 contentValues.put(MovieContract.PopMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
                 db.insert(MovieContract.PopMovieEntry.TABLE_NAME, null, contentValues);
             } else if (type == TYPE_RATE){
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_PAGE, movieItem.getId());
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE, movieItem.getVoteAverage());
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
-                contentValues.put(MovieContract.RatedMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
-                db.insert(MovieContract.RatedMovieEntry.TABLE_NAME, null, contentValues);
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_PAGE, movieItem.getId());
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY, movieItem.getId());
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_AVERATE_VOTE, movieItem.getVoteAverage());
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_RELEASE_DATE, movieItem.getReleaseDate());
+                contentValues.put(MovieContract.RateMovieEntry.COLUNM_POSTER, movieItem.getPosterUrl());
+                db.insert(MovieContract.RateMovieEntry.TABLE_NAME, null, contentValues);
             }
 
             movies[i] = movieItem;

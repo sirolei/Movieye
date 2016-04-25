@@ -44,9 +44,9 @@ public class MovieProvider extends ContentProvider {
 
         sMovieQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
         sPopMovieQueryBuilder.setTables(MovieContract.PopMovieEntry.TABLE_NAME);
-        sRateMovieQueryBuilder.setTables(MovieContract.RatedMovieEntry.TABLE_NAME);
+        sRateMovieQueryBuilder.setTables(MovieContract.RateMovieEntry.TABLE_NAME);
         sVideoQueryBuilder.setTables(MovieContract.VideoEntry.TABLE_NAME);
-        sRateMovieQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
+        sReviewQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
     }
 
     static UriMatcher buildUriMatcher(){
@@ -68,7 +68,7 @@ public class MovieProvider extends ContentProvider {
 
     final String sMovieWithIdSelection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUNM_MOVIE_ID + " = ? ";
     final String sPopMovieWithPageSelection = MovieContract.PopMovieEntry.TABLE_NAME + "." + MovieContract.PopMovieEntry.COLUNM_PAGE + " <= ? ";
-    final String sRateMovieWithPageSelection = MovieContract.RatedMovieEntry.TABLE_NAME  + "." + MovieContract.RatedMovieEntry.COLUNM_PAGE + " <= ?";
+    final String sRateMovieWithPageSelection = MovieContract.RateMovieEntry.TABLE_NAME  + "." + MovieContract.RateMovieEntry.COLUNM_PAGE + " <= ?";
     final String sVideoWithMovieIdSelection = MovieContract.VideoEntry.TABLE_NAME + "." + MovieContract.VideoEntry.COLUNM_MOVIE_KEY + " = ? ";
     final String sReviewWithMovieIdSelection = MovieContract.ReviewEntry.TABLE_NAME + "." + MovieContract.ReviewEntry.COLUNM_MOVIE_KEY + " = ? ";
     final String sReviewWithMovieIdAndPage = MovieContract.ReviewEntry.TABLE_NAME + "." + MovieContract.ReviewEntry.COLUNM_MOVIE_KEY + " = ? AND "
@@ -98,7 +98,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     private Cursor getRateMovieByPage(Uri uri, String[] projection, String order){
-        int page = MovieContract.RatedMovieEntry.getPageIdFromRateMovieUri(uri);
+        int page = MovieContract.RateMovieEntry.getPageIdFromRateMovieUri(uri);
         return sRateMovieQueryBuilder.query(dbHelper.getReadableDatabase(),
                 projection,
                 sRateMovieWithPageSelection,
@@ -183,7 +183,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_RATE:
                 retCursor = dbHelper.getReadableDatabase().query(
-                        MovieContract.RatedMovieEntry.TABLE_NAME,
+                        MovieContract.RateMovieEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -244,7 +244,7 @@ public class MovieProvider extends ContentProvider {
                 return MovieContract.PopMovieEntry.CONTENT_TYPE;
             case MOVIE_RATE:
             case MOVIE_RATE_WITH_PAGE:
-                return MovieContract.RatedMovieEntry.CONTENT_TYPE;
+                return MovieContract.RateMovieEntry.CONTENT_TYPE;
             case MOVIE_REVIEW:
             case MOVIE_REVIEW_WITH_MOVIE_ID:
             case MOVIE_REVIEW_WITH_MOVIE_ID_AND_PAGE:
@@ -284,10 +284,10 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case MOVIE_RATE: {
-                long id = dbHelper.getWritableDatabase().insert(MovieContract.RatedMovieEntry.TABLE_NAME, null, values);
+                long id = dbHelper.getWritableDatabase().insert(MovieContract.RateMovieEntry.TABLE_NAME, null, values);
                 if (id > 0){
-                    int page = values.getAsInteger(MovieContract.RatedMovieEntry.COLUNM_PAGE);
-                    retUri = MovieContract.RatedMovieEntry.buildMovieRateUri(page);
+                    int page = values.getAsInteger(MovieContract.RateMovieEntry.COLUNM_PAGE);
+                    retUri = MovieContract.RateMovieEntry.buildMovieRateUri(page);
                 }else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -331,7 +331,7 @@ public class MovieProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(uri, null);
                 return insertCount;
             case MOVIE_RATE:
-                insertCount = excuteBulkInsert(db, MovieContract.RatedMovieEntry.TABLE_NAME, values);
+                insertCount = excuteBulkInsert(db, MovieContract.RateMovieEntry.TABLE_NAME, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return insertCount;
             case MOVIE_VIDEO:
@@ -356,7 +356,7 @@ public class MovieProvider extends ContentProvider {
         db.beginTransaction();
         try {
             for(ContentValues value : values){
-                long _id = db.insert(MovieContract.PopMovieEntry.TABLE_NAME, null, value);
+                long _id = db.insert(table, null, value);
                 if (_id > 0){
                     insertCount++;
                 }
@@ -385,7 +385,7 @@ public class MovieProvider extends ContentProvider {
                 rowDeleted = db.delete(MovieContract.PopMovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case MOVIE_RATE:
-                rowDeleted = db.delete(MovieContract.RatedMovieEntry.TABLE_NAME, selection, selectionArgs);
+                rowDeleted = db.delete(MovieContract.RateMovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case MOVIE_VIDEO:
                 rowDeleted = db.delete(MovieContract.VideoEntry.TABLE_NAME, selection, selectionArgs);
@@ -415,7 +415,7 @@ public class MovieProvider extends ContentProvider {
                 rowUpdate = db.update(MovieContract.PopMovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case MOVIE_RATE:
-                rowUpdate = db.update(MovieContract.RatedMovieEntry.TABLE_NAME, values, selection, selectionArgs);
+                rowUpdate = db.update(MovieContract.RateMovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case MOVIE_VIDEO:
                 rowUpdate = db.update(MovieContract.VideoEntry.TABLE_NAME, values, selection, selectionArgs);

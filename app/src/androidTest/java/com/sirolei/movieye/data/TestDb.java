@@ -27,7 +27,7 @@ public class TestDb extends AndroidTestCase {
         final HashSet<String> tableNameHashset = new HashSet<>();
         tableNameHashset.add(MovieContract.MovieEntry.TABLE_NAME);
         tableNameHashset.add(MovieContract.PopMovieEntry.TABLE_NAME);
-        tableNameHashset.add(MovieContract.RatedMovieEntry.TABLE_NAME);
+        tableNameHashset.add(MovieContract.RateMovieEntry.TABLE_NAME);
         tableNameHashset.add(MovieContract.VideoEntry.TABLE_NAME);
         tableNameHashset.add(MovieContract.ReviewEntry.TABLE_NAME);
         mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
@@ -97,15 +97,15 @@ public class TestDb extends AndroidTestCase {
         assertTrue("Error: you did not create all the required colunm for pop movie table ", popMovieColumnSet.isEmpty());
 
         // check table rate movie
-        c = db.rawQuery("PRAGMA table_info(" + MovieContract.RatedMovieEntry.TABLE_NAME + ")", null);
+        c = db.rawQuery("PRAGMA table_info(" + MovieContract.RateMovieEntry.TABLE_NAME + ")", null);
         assertTrue("means we cannot query the database for the colunm information of table rate_movie", c.moveToFirst());
         final HashSet<String> rateMovieColumnSet = new HashSet<>();
-        rateMovieColumnSet.add(MovieContract.RatedMovieEntry.COLUNM_PAGE);
-        rateMovieColumnSet.add(MovieContract.RatedMovieEntry.COLUNM_MOVIE_KEY);
-        rateMovieColumnSet.add(MovieContract.RatedMovieEntry.COLUNM_AVERATE_VOTE);
-        rateMovieColumnSet.add(MovieContract.RatedMovieEntry.COLUNM_POSTER);
-        rateMovieColumnSet.add(MovieContract.RatedMovieEntry.COLUNM_RELEASE_DATE);
-        rateMovieColumnSet.add(MovieContract.RatedMovieEntry._ID);
+        rateMovieColumnSet.add(MovieContract.RateMovieEntry.COLUNM_PAGE);
+        rateMovieColumnSet.add(MovieContract.RateMovieEntry.COLUNM_MOVIE_KEY);
+        rateMovieColumnSet.add(MovieContract.RateMovieEntry.COLUNM_AVERATE_VOTE);
+        rateMovieColumnSet.add(MovieContract.RateMovieEntry.COLUNM_POSTER);
+        rateMovieColumnSet.add(MovieContract.RateMovieEntry.COLUNM_RELEASE_DATE);
+        rateMovieColumnSet.add(MovieContract.RateMovieEntry._ID);
 
         columnNameIndex = c.getColumnIndex("name");
         do {
@@ -168,7 +168,7 @@ public class TestDb extends AndroidTestCase {
         assertTrue("Errot : insert colunm to pop movie table failed.", _id > 0);
 
         // check insert rate movie
-        _id = db.insert(MovieContract.RatedMovieEntry.TABLE_NAME, null, MockData.getRateMovieContentValue(102));
+        _id = db.insert(MovieContract.RateMovieEntry.TABLE_NAME, null, MockData.getRateMovieContentValue(102));
         assertTrue("Errot : insert colunm to rate movie table failed.", _id > 0);
 
         // check insert video
@@ -196,7 +196,7 @@ public class TestDb extends AndroidTestCase {
         _id = db.update(MovieContract.PopMovieEntry.TABLE_NAME, MockData.getPopMovieContentValue(103), selection, selectionArgs);
         assertTrue("Errot : update colunm to pop movie table failed.", _id > 0);
 
-        _id = db.update(MovieContract.RatedMovieEntry.TABLE_NAME, MockData.getRateMovieContentValue(103), selection, selectionArgs);
+        _id = db.update(MovieContract.RateMovieEntry.TABLE_NAME, MockData.getRateMovieContentValue(103), selection, selectionArgs);
         assertTrue("Errot : update colunm rate movie table failed.", _id > 0);
 
         _id = db.update(MovieContract.VideoEntry.TABLE_NAME, MockData.getVideoContentValue(103), selection, selectionArgs);
@@ -221,7 +221,7 @@ public class TestDb extends AndroidTestCase {
         _id = db.delete(MovieContract.PopMovieEntry.TABLE_NAME,selection,selectionArgs);
         assertTrue("Errot : delete colunm to pop table failed.", _id > 0);
 
-        _id = db.delete(MovieContract.RatedMovieEntry.TABLE_NAME,selection,selectionArgs);
+        _id = db.delete(MovieContract.RateMovieEntry.TABLE_NAME,selection,selectionArgs);
         assertTrue("Errot : delete colunm to rate table failed.", _id > 0);
 
         _id = db.delete(MovieContract.VideoEntry.TABLE_NAME,selection,selectionArgs);
