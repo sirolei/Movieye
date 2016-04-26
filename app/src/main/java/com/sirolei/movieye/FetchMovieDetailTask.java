@@ -1,14 +1,12 @@
 package com.sirolei.movieye;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.sirolei.movieye.bean.Movie;
 import com.sirolei.movieye.data.MovieContract;
-import com.sirolei.movieye.data.MovieDbHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -104,8 +102,8 @@ public class FetchMovieDetailTask extends AsyncTask<String, Void, Movie> {
             movie.setId(object.getInt(OWM_MOVIE_ID));
             movie.setImdbId(object.getString(OWM_IMDB_ID));
             movie.setPopularity(object.getDouble(OWM_POPULARITY));
-            movie.setPoster(buidlImageUrl(object.getString(OWM_POSTER)));
-            movie.setBackdrop(buidlImageUrl(object.getString(OWM_BACKDROP)));
+            movie.setPoster(buildImageUrl(object.getString(OWM_POSTER)));
+            movie.setBackdrop(buildImageUrl(object.getString(OWM_BACKDROP)));
             movie.setOriginalLanguage(object.getString(OWM_ORIGINAL_LANGUAGE));
             movie.setTitle(object.getString(OWM_TITLE));
             movie.setOriginalTitle(object.getString(OWM_ORIGINAL_TITLE));
@@ -141,10 +139,7 @@ public class FetchMovieDetailTask extends AsyncTask<String, Void, Movie> {
             contentValues.put(MovieContract.MovieEntry.COLUNM_VOTE_COUNT, movie.getVoteCount());
             contentValues.put(MovieContract.MovieEntry.COLUNM_UPDATE_TIME, System.currentTimeMillis());
 
-            MovieDbHelper dbHelper = new MovieDbHelper(MovieApplicarion.getAppContext());
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-            db.insert(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
-            db.close();
+            MovieApplicarion.getAppContext().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -171,7 +166,7 @@ public class FetchMovieDetailTask extends AsyncTask<String, Void, Movie> {
         public void onPostExecute(Movie movie);
     }
 
-    private String buidlImageUrl(String path){
+    private String buildImageUrl(String path){
         return  BASE_IMG_URL + "w185" + path;
     }
 }

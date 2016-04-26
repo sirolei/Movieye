@@ -60,7 +60,7 @@ public class MovieAdapter extends CursorAdapter {
 //    public int getCount() {
 //        return movieItemArrayList.size();
 //    }
-//
+//0
 //    @Override
 //    public Object getItem(int position) {
 //        return movieItemArrayList.get(position);

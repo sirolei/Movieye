@@ -1,7 +1,6 @@
 package com.sirolei.movieye.fragment;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,7 +18,6 @@ import com.sirolei.movieye.FetchMovieDetailTask;
 import com.sirolei.movieye.R;
 import com.sirolei.movieye.bean.Movie;
 import com.sirolei.movieye.data.MovieContract;
-import com.sirolei.movieye.data.MovieDbHelper;
 import com.sirolei.movieye.util.TimeUtility;
 import com.squareup.picasso.Picasso;
 
@@ -41,6 +39,25 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
     TextView releaseDate;
 
     final String TAG = DetailFragment.class.getSimpleName();
+    final String[] movieProjection = new String[]{MovieContract.MovieEntry.COLUNM_TITLE,
+            MovieContract.MovieEntry.COLUNM_VOTE_AVERAGE,
+            MovieContract.MovieEntry.COLUNM_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUNM_OVERVIEW,
+            MovieContract.MovieEntry.COLUNM_FAVORITE,
+            MovieContract.MovieEntry.COLUNM_RUNTIME,
+            MovieContract.MovieEntry.COLUNM_POSTER,
+            MovieContract.MovieEntry.COLUNM_UPDATE_TIME};
+
+    final int COLUMN_TITLE_INDEX = 0;
+    final int VOLUMN_VOTE_AVERAGE_INDEX = 1;
+    final int COLUMN_RELEASE_DATE_INDEX = 2;
+    final int COLUMN_OVERVIEW_INDEX = 3;
+    final int COLUMN_FAVORITE_INDEX = 4;
+    final int COLUMN_RUNTIME_INDEX = 5;
+    final int COLUMN_POSTER_INDEX = 6;
+    final int COLUMN_UPDATE_TIME_INDEX = 7;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,12 +70,6 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
         releaseDate = (TextView) rootView.findViewById(R.id.fragment_detail_release);
         markAsFavorite = (Button) rootView.findViewById(R.id.fragment_detail_markfavorite);
         markAsFavorite.setOnClickListener(this);
-//        average_vote.setText(String.format(getString(R.string.average_vote), movieItem.getVoteAverage()));
-//        Picasso.with(getActivity())
-//                .load(movieItem.getPosterUrl())
-//                .placeholder(R.mipmap.ic_movie_holder)
-//                .error(R.mipmap.ic_movie_error)
-//                .into(poster);
         return rootView;
     }
 
@@ -72,42 +83,31 @@ public class DetailFragment extends Fragment implements FetchMovieDetailTask.Det
             return;
         }
 
-        MovieDbHelper dbHelper = new MovieDbHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String[] columns = new String[]{MovieContract.MovieEntry.COLUNM_TITLE,
-                MovieContract.MovieEntry.COLUNM_VOTE_AVERAGE,
-                MovieContract.MovieEntry.COLUNM_RELEASE_DATE,
-                MovieContract.MovieEntry.COLUNM_OVERVIEW,
-                MovieContract.MovieEntry.COLUNM_FAVORITE,
-                MovieContract.MovieEntry.COLUNM_RUNTIME,
-                MovieContract.MovieEntry.COLUNM_POSTER,
-                MovieContract.MovieEntry.COLUNM_UPDATE_TIME};
-        String selection = "movie_id=?";
-        String[] selectionArgs = new String[]{String.valueOf(id)};
-        Cursor cursor = db.query(MovieContract.MovieEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+
+        Cursor cursor = getActivity().getContentResolver().query(MovieContract.MovieEntry.buildMovieUrl(id), movieProjection,null, null, null);
         if (!cursor.moveToFirst()){
             updateMovieDetail(String.valueOf(id));
         }else {
             cursor.moveToFirst();
-            int lastUpdateDay = TimeUtility.getJulientDay(cursor.getLong(7));
+            int lastUpdateDay = TimeUtility.getJulientDay(cursor.getLong(COLUMN_UPDATE_TIME_INDEX));
             int curDay = TimeUtility.getJulientDay(System.currentTimeMillis());
             if (curDay - lastUpdateDay >= 1){
                 Log.d(TAG, "need updateMovieDetail from " + lastUpdateDay + " to " + curDay);
                 updateMovieDetail(String.valueOf(id));
             }else {
-                average_vote.setText(String.format(getString(R.string.average_vote), cursor.getDouble(1)));
-                title.setText(cursor.getString(0));
-                synopsis.setText(cursor.getString(3));
-                runtime.setText(getResources().getString(R.string.runtime, cursor.getString(5)));
-                releaseDate.setText(cursor.getString(2));
+                average_vote.setText(String.format(getString(R.string.average_vote), cursor.getDouble(VOLUMN_VOTE_AVERAGE_INDEX)));
+                title.setText(cursor.getString(COLUMN_TITLE_INDEX));
+                synopsis.setText(cursor.getString(COLUMN_OVERVIEW_INDEX));
+                runtime.setText(getResources().getString(R.string.runtime, cursor.getString(COLUMN_RUNTIME_INDEX)));
+                releaseDate.setText(cursor.getString(COLUMN_RELEASE_DATE_INDEX));
                 Picasso.with(getActivity())
-                        .load(cursor.getString(6))
+                        .load(cursor.getString(COLUMN_POSTER_INDEX))
                         .placeholder(R.mipmap.ic_movie_holder)
                         .error(R.mipmap.ic_movie_error)
                         .into(poster);
             }
+            cursor.close();
         }
-        db.close();
     }
 
     private void updateMovieDetail(String id){

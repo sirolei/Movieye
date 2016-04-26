@@ -2,10 +2,13 @@ package com.sirolei.movieye.fragment;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +32,7 @@ import com.squareup.picasso.Picasso;
  * Created by sansi on 2016/1/16.
  */
 public class MovieFragment extends Fragment implements AdapterView.OnItemClickListener,
-        FetchMoviesTask.OnPostExecuteListener, AbsListView.OnScrollListener{
+        FetchMoviesTask.OnPostExecuteListener, AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>{
 
     private final String TAG = MovieFragment.class.getSimpleName();
     private String popUrl = "http://api.themoviedb.org/3/movie/popular?page=1&api_key=87941f3e4714ec06d5bf65f0a968a61f";
@@ -43,6 +46,8 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     private String currentType = FetchMoviesTask.TYPE_POP;
     private FetchMoviesTask task;
     public static final String INTENT_MOVIE_ID = "movie_id";
+    private static final int MOVIE_LOADER = 0;
+
     public MovieFragment() {
     }
 
@@ -77,34 +82,32 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
         int id = item.getItemId();
         switch (id){
             case R.id.action_sort_pop:{
-                Cursor cursor = getActivity().getContentResolver().query(MovieContract.PopMovieEntry.buildMoviePopUri(1),
-                        null,
-                        null,
-                        null,
-                        null);
-                if ((System.currentTimeMillis() - PreferenceUtility.getPopUpdatetime(getActivity())) > MovieAdapter.DAY_IN_MILLIS
-                        || cursor.moveToFirst() == false){
+//                Cursor cursor = getActivity().getContentResolver().query(MovieContract.PopMovieEntry.buildMoviePopUri(1),
+//                        null,
+//                        null,
+//                        null,
+//                        null);
+                currentType = FetchMoviesTask.TYPE_POP;
+                if ((System.currentTimeMillis() - PreferenceUtility.getPopUpdatetime(getActivity())) > MovieAdapter.DAY_IN_MILLIS){
                     refresh(FetchMoviesTask.TYPE_POP);
                 }else {
-                    movieAdapter.swapCursor(cursor);
+                    getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
                 }
 
-                currentType = FetchMoviesTask.TYPE_POP;
                 return true;
             }
             case R.id.action_sort_rate:{
-                Cursor cursor = getActivity().getContentResolver().query(MovieContract.RateMovieEntry.buildMovieRateUri(1),
-                        null,
-                        null,
-                        null,
-                        null);
-                if ((System.currentTimeMillis() - PreferenceUtility.getRateUpdatetime(getActivity())) > MovieAdapter.DAY_IN_MILLIS
-                        || cursor.moveToFirst() == false){
+//                Cursor cursor = getActivity().getContentResolver().query(MovieContract.RateMovieEntry.buildMovieRateUri(1),
+//                        null,
+//                        null,
+//                        null,
+//                        null);
+                currentType = FetchMoviesTask.TYPE_RATE;
+                if ((System.currentTimeMillis() - PreferenceUtility.getRateUpdatetime(getActivity())) > MovieAdapter.DAY_IN_MILLIS){
                     refresh(FetchMoviesTask.TYPE_RATE);
                 }else {
-                    movieAdapter.swapCursor(cursor);
+                    getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
                 }
-                currentType = FetchMoviesTask.TYPE_RATE;
                 return true;
             }
             default:
@@ -113,22 +116,13 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (currentType == FetchMoviesTask.TYPE_POP){
-            Cursor cursor = getActivity().getContentResolver().query(MovieContract.PopMovieEntry.buildMoviePopUri(1),
-                    null,
-                    null,
-                    null,
-                    null);
-            movieAdapter.swapCursor(cursor);
-        }else if (currentType == FetchMoviesTask.TYPE_RATE){
-            Cursor cursor = getActivity().getContentResolver().query(MovieContract.RateMovieEntry.buildMovieRateUri(1),
-                    null,
-                    null,
-                    null,
-                    null);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        if ((System.currentTimeMillis() - PreferenceUtility.getPopUpdatetime(getActivity())) > MovieAdapter.DAY_IN_MILLIS){
+            refresh(FetchMoviesTask.TYPE_POP);
+        }else {
+            getLoaderManager().initLoader(MOVIE_LOADER, null, this);
         }
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -164,8 +158,9 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
     public void onPostExecute(Cursor cursor) {
         mProgressBar.setVisibility(View.GONE);
         if (cursor != null){
-            Log.d(TAG, "get movies " + cursor.getCount());
-            movieAdapter.swapCursor(cursor);
+//            Log.d(TAG, "get movies " + cursor.getCount());
+//            movieAdapter.swapCursor(cursor);
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
             if (currentType == FetchMoviesTask.TYPE_POP){
                 PreferenceUtility.setPopUpdateTime(getActivity(), System.currentTimeMillis());
             }else if (currentType == FetchMoviesTask.TYPE_RATE){
@@ -207,5 +202,27 @@ public class MovieFragment extends Fragment implements AdapterView.OnItemClickLi
             task.unregisterListner();
             task.cancel(true);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri uri = null;
+        if (currentType == FetchMoviesTask.TYPE_POP){
+            uri = MovieContract.PopMovieEntry.buildMoviePopUri(1);
+        }else if (currentType == FetchMoviesTask.TYPE_RATE){
+            uri = MovieContract.RateMovieEntry.buildMovieRateUri(1);
+        }
+
+        return new CursorLoader(getActivity(), uri, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        movieAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        movieAdapter.swapCursor(null);
     }
 }
